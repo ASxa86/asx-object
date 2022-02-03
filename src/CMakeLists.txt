@@ -5,12 +5,14 @@ add_library(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
 	${PROJECT_INCLUDE_DIR}/asx-node/NodeAbstract.h
 	${PROJECT_INCLUDE_DIR}/asx-node/Node.h
+	${PROJECT_INCLUDE_DIR}/asx-node/NodeGroup.h
 	${PROJECT_INCLUDE_DIR}/asx-node/VisitorAbstract.h
 	${PROJECT_INCLUDE_DIR}/asx-node/VisitorSerialize.h
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
 	Node.cpp
+	NodeGroup.cpp
 	VisitorSerialize.cpp
 )
 
