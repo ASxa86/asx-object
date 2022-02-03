@@ -3,6 +3,10 @@
 
 using asx::node::VisitorSerialize;
 
+void VisitorSerialize::accept(Node& x)
+{
+}
+
 void VisitorSerialize::accept(NodeGroup& x)
 {
 }

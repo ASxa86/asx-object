@@ -8,6 +8,7 @@ namespace asx::node
 	class ASX_NODE_EXPORT VisitorSerialize : public VisitorAbstract
 	{
 	public:
+		void accept(Node& x) override;
 		void accept(NodeGroup& x) override;
 	};
 }
