@@ -1,19 +1,17 @@
-project(asx-node)
+project(asx-object)
 
 add_library(${PROJECT_NAME})
 
 target_sources(${PROJECT_NAME} PRIVATE
-	${PROJECT_INCLUDE_DIR}/asx-node/NodeAbstract.h
-	${PROJECT_INCLUDE_DIR}/asx-node/Node.h
-	${PROJECT_INCLUDE_DIR}/asx-node/NodeGroup.h
-	${PROJECT_INCLUDE_DIR}/asx-node/VisitorAbstract.h
-	${PROJECT_INCLUDE_DIR}/asx-node/VisitorSerialize.h
+	${PROJECT_INCLUDE_DIR}/asx-object/Bytes.h
+	${PROJECT_INCLUDE_DIR}/asx-object/Object.h
+	${PROJECT_INCLUDE_DIR}/asx-object/String.h
 )
 
 target_sources(${PROJECT_NAME} PRIVATE
-	Node.cpp
-	NodeGroup.cpp
-	VisitorSerialize.cpp
+	Bytes.cpp
+	Object.cpp
+	String.cpp
 )
 
 project_install_target()
