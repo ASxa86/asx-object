@@ -6,6 +6,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	Bytes.test.cpp
 	Object.test.cpp
 	String.test.cpp
+	TypeTraits.test.cpp
 )
 
 find_package(GTest CONFIG REQUIRED)

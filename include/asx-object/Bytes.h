@@ -1,5 +1,6 @@
 #pragma once
 
+#include <asx-object/TypeTraits.h>
 #include <asx-object/export.hxx>
 #include <cstddef>
 #include <span>
@@ -19,6 +20,9 @@ namespace asx::object
 			v.resize(sizeof(TNoRef));
 			std::memcpy(v.data(), &x, sizeof(x));
 		}
+		else if constexpr(asx::object::is_array<TNoRef> == true)
+		{
+		}
 
 		return v;
 	}
@@ -34,6 +38,9 @@ namespace asx::object
 		if constexpr(std::is_arithmetic_v<TNoRef> == true)
 		{
 			std::memcpy(&t, x.data(), x.size());
+		}
+		else if constexpr(asx::object::is_array<TNoRef> == true)
+		{
 		}
 	}
 
