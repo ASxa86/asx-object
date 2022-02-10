@@ -50,8 +50,8 @@ TEST(TypeTraits, vector)
 TEST(TypeTraits, array)
 {
 	auto test = asx::object::is_container<std::array<int, sizeof(int)>>::value;
-	EXPECT_TRUE(test);
+	EXPECT_FALSE(test);
 
 	test = asx::object::is_container<std::array<std::string, sizeof(std::string)>>::value;
-	EXPECT_TRUE(test);
+	EXPECT_FALSE(test);
 }

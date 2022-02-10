@@ -20,8 +20,17 @@ namespace asx::object
 			v.resize(sizeof(TNoRef));
 			std::memcpy(v.data(), &x, sizeof(x));
 		}
-		else if constexpr(asx::object::is_array<TNoRef> == true)
+		else if constexpr(asx::object::is_array<TNoRef>::value == true || std::is_same<TNoRef, std::string>::value == true
+						  || std::is_same<TNoRef, std::string_view>::value == true)
 		{
+			auto b = ToBytes(x.size());
+			v.insert(std::end(v), std::begin(b), std::end(b));
+
+			for(const auto& i : x)
+			{
+				b = ToBytes(i);
+				v.insert(std::end(v), std::begin(b), std::end(b));
+			}
 		}
 
 		return v;
@@ -31,16 +40,40 @@ namespace asx::object
 	auto BytesTo(std::span<std::byte> x);
 
 	template <typename T>
-	void BytesTo([[maybe_unused]] std::span<std::byte> x, T& t)
+	std::size_t BytesTo([[maybe_unused]] std::span<std::byte> x, T& t)
 	{
 		using TNoRef = typename std::remove_reference<T>::type;
 
 		if constexpr(std::is_arithmetic_v<TNoRef> == true)
 		{
-			std::memcpy(&t, x.data(), x.size());
+			std::memcpy(&t, x.data(), sizeof(t));
+			return sizeof(t);
 		}
-		else if constexpr(asx::object::is_array<TNoRef> == true)
+		else if constexpr(asx::object::is_array<TNoRef>::value == true)
 		{
+			auto skip = sizeof(TNoRef::size_type);
+
+			for(auto& i : t)
+			{
+				skip += BytesTo<TNoRef::value_type>(std::span{std::begin(x) + skip, std::end(x)}, i);
+			}
+
+			return x.size();
+		}
+		else if constexpr(std::is_same<TNoRef, std::string>::value == true || std::is_same<TNoRef, std::string_view>::value == true)
+		{
+			typename TNoRef::size_type s{};
+
+			auto skip = BytesTo<TNoRef::size_type>(x, s);
+
+			t.resize(s);
+
+			for(auto& i : t)
+			{
+				skip += BytesTo<decltype(i)>(std::span{std::begin(x) + skip, std::end(x)}, i);
+			}
+
+			return t.size() * sizeof(TNoRef::value_type);
 		}
 	}
 
