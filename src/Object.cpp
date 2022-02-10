@@ -7,12 +7,18 @@ Object::Object()
 {
 }
 
+Object* Object::getParent() const noexcept
+{
+	return this->parent;
+}
+
 bool Object::addChild(std::shared_ptr<Object> x)
 {
 	const auto result = std::ranges::find(this->children, x);
 
 	if(result == std::end(this->children))
 	{
+		x->parent = this;
 		this->children.emplace_back(std::move(x));
 		return true;
 	}
@@ -26,6 +32,7 @@ bool Object::removeChild(std::shared_ptr<Object> x)
 
 	if(std::begin(result) != std::end(this->children))
 	{
+		x->parent = nullptr;
 		this->children.erase(std::begin(result), std::end(result));
 		return true;
 	}
@@ -41,4 +48,17 @@ Object* Object::getChild(SizeType x) const
 	}
 
 	return nullptr;
+}
+
+std::vector<Object*> Object::getChildren() const
+{
+	std::vector<Object*> v;
+	v.reserve(this->children.size());
+
+	for(const auto& child : this->children)
+	{
+		v.emplace_back(child.get());
+	}
+
+	return v;
 }

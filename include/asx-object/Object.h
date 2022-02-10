@@ -1,6 +1,7 @@
 #pragma once
 
 #include <asx-object/export.hxx>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -26,39 +27,40 @@ namespace asx::object
 		Object& operator=(const Object&) = delete;
 		Object& operator=(Object&&) = delete;
 
+		Object* getParent() const noexcept;
+
 		bool addChild(std::shared_ptr<Object> x);
 		bool removeChild(std::shared_ptr<Object> x);
 
 		Object* getChild(SizeType x = {}) const;
+		std::vector<Object*> getChildren() const;
 
-		template <typename Func>
-		std::vector<Object*> getChildren(Func x = [](const auto& x) { return x.get(); }) const
+		template <Derived<Object> T>
+		T* getChild() const
 		{
-			std::vector<Object*> v;
-			v.reserve(this->children.size());
-
 			for(const auto& child : this->children)
 			{
-				v.push_back(x(child));
+				auto typeChild = dynamic_cast<T*>(child.get());
+
+				if(typeChild != nullptr)
+				{
+					return typeChild;
+				}
 			}
 
-			return v;
+			return nullptr;
 		}
 
 		template <Derived<Object> T>
-		auto getChild(SizeType x = {}) const
-		{
-			auto child = this->getChild(x);
-			return dynamic_cast<T*>(child);
-		}
-
-		template <Derived<Object> T, typename Func>
-		auto getChildren(Func x = [](const auto& x) { return x.get(); }) const
+		auto getChildren() const
 		{
 			std::vector<T*> v;
-			v.reserve(this->children.size());
 
-			for(auto child : this->getChildren(x))
+			const auto children = this->getChildren();
+
+			v.reserve(children.size());
+
+			for(auto child : children)
 			{
 				auto typeChild = dynamic_cast<T*>(child);
 
@@ -73,5 +75,6 @@ namespace asx::object
 
 	private:
 		std::vector<std::shared_ptr<Object>> children;
+		Object* parent{};
 	};
 }
