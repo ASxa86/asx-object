@@ -103,7 +103,7 @@ namespace asx::object
 			auto skip = BytesTo<decltype(f)>(x, f);
 
 			typename TNoRef::second_type s{};
-			skip += BytesTo<decltype(f)>(std::span{std::cbegin(x) + skip, std::cend(x)}, s);
+			skip += BytesTo<decltype(s)>(std::span{std::cbegin(x) + skip, std::cend(x)}, s);
 
 			t = {f, s};
 

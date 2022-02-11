@@ -219,3 +219,16 @@ TEST(Bytes, vector)
 	const auto v = asx::object::BytesTo<decltype(test)>(value);
 	EXPECT_EQ(v, test);
 }
+
+TEST(Bytes, voltron)
+{
+	std::map<std::string, std::vector<std::array<std::string, 2>>> test;
+	test["one"].push_back({"one", "two"});
+	test["two"].push_back({"one", "two"});
+	test["three"].push_back({"one", "two"});
+	test["four"].push_back({"one", "two"});
+
+	auto value = asx::object::ToBytes(test);
+	const auto v = asx::object::BytesTo<decltype(test)>(value);
+	EXPECT_EQ(v, test);
+}
