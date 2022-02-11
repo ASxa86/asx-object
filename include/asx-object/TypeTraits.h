@@ -1,9 +1,13 @@
 #pragma once
 
 #include <array>
+#include <deque>
 #include <map>
+#include <set>
 #include <type_traits>
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 namespace asx::object
 {
@@ -34,6 +38,16 @@ namespace asx::object
 	};
 
 	template <typename T>
+	struct is_pair : std::false_type
+	{
+	};
+
+	template <typename K, typename V>
+	struct is_pair<std::pair<K, V>> : std::true_type
+	{
+	};
+
+	template <typename T>
 	struct is_map : std::false_type
 	{
 	};
@@ -50,6 +64,46 @@ namespace asx::object
 
 	template <typename K, typename V>
 	struct is_unordered_map<std::unordered_map<K, V>> : std::true_type
+	{
+	};
+
+	template <typename T>
+	struct is_set : std::false_type
+	{
+	};
+
+	template <typename T>
+	struct is_set<std::set<T>> : std::true_type
+	{
+	};
+
+	template <typename T>
+	struct is_unordered_set : std::false_type
+	{
+	};
+
+	template <typename T>
+	struct is_unordered_set<std::unordered_set<T>> : std::true_type
+	{
+	};
+
+	template <typename T>
+	struct is_vector : std::false_type
+	{
+	};
+
+	template <typename T>
+	struct is_vector<std::vector<T>> : std::true_type
+	{
+	};
+
+	template <typename T>
+	struct is_deque : std::false_type
+	{
+	};
+
+	template <typename T>
+	struct is_deque<std::deque<T>> : std::true_type
 	{
 	};
 }
