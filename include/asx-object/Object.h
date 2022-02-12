@@ -27,6 +27,9 @@ namespace asx::object
 		Object& operator=(const Object&) = delete;
 		Object& operator=(Object&&) = delete;
 
+		void setID(std::string_view x);
+		std::string_view getID() const;
+
 		Object* getParent() const noexcept;
 
 		bool addChild(std::shared_ptr<Object> x);
@@ -74,6 +77,7 @@ namespace asx::object
 		}
 
 	private:
+		std::string id;
 		std::vector<std::shared_ptr<Object>> children;
 		Object* parent{};
 	};

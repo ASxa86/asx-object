@@ -7,6 +7,16 @@ Object::Object()
 {
 }
 
+void Object::setID(std::string_view x)
+{
+	this->id = x;
+}
+
+std::string_view Object::getID() const
+{
+	return this->id;
+}
+
 Object* Object::getParent() const noexcept
 {
 	return this->parent;
