@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <chrono>
 #include <deque>
 #include <map>
 #include <set>
@@ -104,6 +105,16 @@ namespace asx::object
 
 	template <typename T>
 	struct is_deque<std::deque<T>> : std::true_type
+	{
+	};
+
+	template <class T>
+	struct is_duration : std::false_type
+	{
+	};
+
+	template <class Rep, class Period>
+	struct is_duration<std::chrono::duration<Rep, Period>> : std::true_type
 	{
 	};
 }
