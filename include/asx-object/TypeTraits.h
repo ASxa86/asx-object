@@ -108,13 +108,33 @@ namespace asx::object
 	{
 	};
 
-	template <class T>
+	template <typename T>
 	struct is_duration : std::false_type
 	{
 	};
 
-	template <class Rep, class Period>
+	template <typename Rep, class Period>
 	struct is_duration<std::chrono::duration<Rep, Period>> : std::true_type
+	{
+	};
+
+	template <typename T>
+	struct is_string : std::false_type
+	{
+	};
+
+	template <>
+	struct is_string<std::string> : std::true_type
+	{
+	};
+
+	template <>
+	struct is_string<const char*> : std::true_type
+	{
+	};
+
+	template <>
+	struct is_string<std::string_view> : std::true_type
 	{
 	};
 }
