@@ -30,10 +30,36 @@ TEST(String, pair_int)
 
 TEST(String, pair_string)
 {
-	std::pair<std::string, std::string> test{"hello world", "world, hello"};
-	const auto string = asx::object::ToString(test);
-	const auto value = asx::object::StringTo<std::pair<std::string, std::string>>(string);
-	EXPECT_EQ(value, test);
+	{
+		std::pair<std::string, std::string> test{"hello world", "world, hello"};
+		const auto string = asx::object::ToString(test);
+		const auto value = asx::object::StringTo<std::pair<std::string, std::string>>(string);
+		EXPECT_EQ(value, test);
+	}
+
+	{
+		std::pair<std::string, std::string> test{"{hello world}:", "{world, hello}"};
+		const auto string = asx::object::ToString(test);
+		const auto value = asx::object::StringTo<std::pair<std::string, std::string>>(string);
+		EXPECT_EQ(value, test);
+	}
+}
+
+TEST(String, pair_int_string)
+{
+	{
+		std::pair<std::string, int> test{"hello world", std::numeric_limits<int>::max()};
+		const auto string = asx::object::ToString(test);
+		const auto value = asx::object::StringTo<std::pair<std::string, int>>(string);
+		EXPECT_EQ(value, test);
+	}
+
+	{
+		std::pair<int, std::string> test{std::numeric_limits<int>::max(), "hello world"};
+		const auto string = asx::object::ToString(test);
+		const auto value = asx::object::StringTo<std::pair<int, std::string>>(string);
+		EXPECT_EQ(value, test);
+	}
 }
 
 TEST(String, map)

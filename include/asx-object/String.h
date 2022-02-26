@@ -81,28 +81,28 @@ namespace asx::object
 		{
 			std::string s = "{";
 
-			if constexpr(std::is_same<std::string, TNoRef::first_type>::value == true)
+			if constexpr(asx::object::is_string<TNoRef::first_type>::value == true)
 			{
 				s += "\"";
 			}
 
 			s += ToString(x.first);
 
-			if constexpr(std::is_same<std::string, TNoRef::first_type>::value == true)
+			if constexpr(asx::object::is_string<TNoRef::first_type>::value == true)
 			{
 				s += "\"";
 			}
 
 			s += ":";
 
-			if constexpr(std::is_same<std::string, TNoRef::first_type>::value == true)
+			if constexpr(asx::object::is_string<TNoRef::second_type>::value == true)
 			{
 				s += "\"";
 			}
 
 			s += ToString(x.second);
 
-			if constexpr(std::is_same<std::string, TNoRef::first_type>::value == true)
+			if constexpr(asx::object::is_string<TNoRef::second_type>::value == true)
 			{
 				s += "\"";
 			}
@@ -234,9 +234,12 @@ namespace asx::object
 						++it;
 					}
 
-					StringTo<TNoRef::first_type>(std::string_view{startIt, endIt}, t.second);
+					StringTo<TNoRef::second_type>(std::string_view{startIt, endIt}, t.second);
 				}
 			}
+		}
+		else if constexpr(asx::object::is_container<TNoRef>::value == true)
+		{
 		}
 		else if constexpr(std::is_class<TNoRef>::value == true)
 		{
