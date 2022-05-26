@@ -39,7 +39,7 @@ namespace asx::object
 	template <typename T>
 	std::string ToString([[maybe_unused]] const T& x)
 	{
-		using TNoRef = typename std::remove_reference<T>::type;
+		using TNoRef = typename std::remove_const<std::remove_reference<T>::type>::type;
 
 		if constexpr(asx::object::is_duration<TNoRef>::value == true)
 		{
@@ -81,33 +81,56 @@ namespace asx::object
 		{
 			std::string s = "{";
 
-			if constexpr(asx::object::is_string<TNoRef::first_type>::value == true)
+			using first_type = typename std::remove_const<std::remove_reference<TNoRef::first_type>::type>::type;
+
+			if constexpr(asx::object::is_string<first_type>::value == true)
 			{
 				s += "\"";
 			}
 
 			s += ToString(x.first);
 
-			if constexpr(asx::object::is_string<TNoRef::first_type>::value == true)
+			if constexpr(asx::object::is_string<first_type>::value == true)
 			{
 				s += "\"";
 			}
 
 			s += ":";
 
-			if constexpr(asx::object::is_string<TNoRef::second_type>::value == true)
+			using second_type = typename std::remove_const<std::remove_reference<TNoRef::second_type>::type>::type;
+
+			if constexpr(asx::object::is_string<second_type>::value == true)
 			{
 				s += "\"";
 			}
 
 			s += ToString(x.second);
 
-			if constexpr(asx::object::is_string<TNoRef::second_type>::value == true)
+			if constexpr(asx::object::is_string<second_type>::value == true)
 			{
 				s += "\"";
 			}
 
 			s += "}";
+			return s;
+		}
+		else if constexpr(asx::object::is_container<TNoRef>::value == true || asx::object::is_array<TNoRef>::value == true)
+		{
+			std::string s = "[";
+
+			for(const auto& i : x)
+			{
+				s += ToString(i);
+				s += ", ";
+			}
+
+			if(std::size(s) > 1)
+			{
+				s.pop_back();
+				s.pop_back();
+			}
+
+			s += "]";
 			return s;
 		}
 		else if constexpr(std::is_class<TNoRef>::value == true)
@@ -161,10 +184,12 @@ namespace asx::object
 				}
 			};
 
+			skipws();
+
 			auto startIt = it;
 			auto endIt = it;
 
-			if(it != std::end(x) && *it == '{')
+			if(it != end && *it == '{')
 			{
 				++it;
 				skipws();
@@ -174,7 +199,7 @@ namespace asx::object
 					++it;
 					startIt = it;
 
-					while(it != std::end(x) && *it != '\"')
+					while(it != end && *it != '\"')
 					{
 						++it;
 					}
@@ -185,7 +210,7 @@ namespace asx::object
 				{
 					startIt = it;
 
-					while(it != std::end(x) && *it != ':')
+					while(it != end && *it != ':')
 					{
 						++it;
 					}
@@ -193,24 +218,25 @@ namespace asx::object
 					endIt = it;
 				}
 
-				StringTo<TNoRef::first_type>(std::string_view{startIt, endIt}, t.first);
+				using first_type = typename std::remove_const<std::remove_reference<TNoRef::first_type>::type>::type;
+				StringTo<first_type>(std::string_view{startIt, endIt}, t.first);
 
-				while(it != std::end(x) && *it != ':')
+				while(it != end && *it != ':')
 				{
 					++it;
 				}
 
-				if(it != std::end(x) && *it == ':')
+				if(it != end && *it == ':')
 				{
 					++it;
 					skipws();
 
-					if(it != std::end(x) && *it == '\"')
+					if(it != end && *it == '\"')
 					{
 						++it;
 						startIt = it;
 
-						while(it != std::end(x) && *it != '\"')
+						while(it != end && *it != '\"')
 						{
 							++it;
 						}
@@ -221,7 +247,7 @@ namespace asx::object
 					{
 						startIt = it;
 
-						while(it != std::end(x) && *it != '}')
+						while(it != end && *it != '}')
 						{
 							++it;
 						}
@@ -229,17 +255,106 @@ namespace asx::object
 						endIt = it;
 					}
 
-					while(it != std::end(x) && *it != '}')
+					while(it != end && *it != '}')
 					{
 						++it;
 					}
 
-					StringTo<TNoRef::second_type>(std::string_view{startIt, endIt}, t.second);
+					using second_type = typename std::remove_const<std::remove_reference<TNoRef::second_type>::type>::type;
+					StringTo<second_type>(std::string_view{startIt, endIt}, t.second);
 				}
 			}
 		}
 		else if constexpr(asx::object::is_container<TNoRef>::value == true)
 		{
+			auto it = std::begin(x);
+			const auto end = std::end(x);
+
+			const auto skipws = [&it, end]
+			{
+				while(it != end && (*it == ' ' || *it == '\t'))
+				{
+					++it;
+				}
+			};
+
+			auto startIt = it;
+			auto endIt = it;
+
+			skipws();
+
+			if(it != end && *it == '[')
+			{
+				while(it != end && *it != ']')
+				{
+					++it;
+
+					skipws();
+
+					startIt = it;
+
+					while(it != end && *it != ',' && *it != ']')
+					{
+						++it;
+					}
+
+					endIt = it;
+
+					using value_type = typename std::remove_const<std::remove_reference<TNoRef::value_type>::type>::type;
+
+					if(startIt != endIt)
+					{
+						const auto value = StringTo<value_type>(std::string_view{startIt, endIt});
+						t.insert(std::end(t), value);
+					}
+				}
+			}
+		}
+		else if constexpr(asx::object::is_array<TNoRef>::value == true)
+		{
+			auto it = std::begin(x);
+			const auto end = std::end(x);
+
+			const auto skipws = [&it, end]
+			{
+				while(it != end && (*it == ' ' || *it == '\t'))
+				{
+					++it;
+				}
+			};
+
+			auto startIt = it;
+			auto endIt = it;
+
+			skipws();
+
+			auto arrayIt = std::begin(t);
+			typename TNoRef::size_type i{};
+
+			if(it != end && *it == '[')
+			{
+				while(it != end && *it != ']')
+				{
+					++it;
+
+					skipws();
+
+					startIt = it;
+
+					while(it != end && *it != ',' && *it != ']')
+					{
+						++it;
+					}
+
+					endIt = it;
+
+					using value_type = typename std::remove_const<std::remove_reference<TNoRef::value_type>::type>::type;
+
+					const auto value = StringTo<value_type>(std::string_view{startIt, endIt});
+					t[i] = value;
+					i++;
+				}
+			}
 		}
 		else if constexpr(std::is_class<TNoRef>::value == true)
 		{
@@ -252,8 +367,19 @@ namespace asx::object
 	{
 		using TNoRef = typename std::remove_const<typename std::remove_reference<T>::type>::type;
 
-		TNoRef t{};
-		StringTo(x, t);
-		return t;
+		if constexpr(asx::object::is_pair<TNoRef>::value == true)
+		{
+			// Special case where key-value value_types for maps are const.
+			using first_type = typename std::remove_const<TNoRef::first_type>::type;
+			std::pair<first_type, TNoRef::second_type> t{};
+			StringTo(x, t);
+			return t;
+		}
+		else
+		{
+			TNoRef t{};
+			StringTo(x, t);
+			return t;
+		}
 	}
 }
