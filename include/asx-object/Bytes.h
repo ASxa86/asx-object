@@ -76,7 +76,7 @@ namespace asx::object
 
 			for(auto& i : t)
 			{
-				skip += BytesTo<TNoRef::value_type>(std::span{std::cbegin(x) + skip, std::cend(x)}, i);
+				skip += BytesTo<typename TNoRef::value_type>(std::span{std::cbegin(x) + skip, std::cend(x)}, i);
 			}
 
 			return skip;

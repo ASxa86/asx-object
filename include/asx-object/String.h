@@ -39,7 +39,7 @@ namespace asx::object
 	template <typename T>
 	std::string ToString([[maybe_unused]] const T& x)
 	{
-		using TNoRef = typename std::remove_const<std::remove_reference<T>::type>::type;
+		using TNoRef = typename std::remove_const<typename std::remove_reference<T>::type>::type;
 
 		if constexpr(asx::object::is_duration<TNoRef>::value == true)
 		{
@@ -81,7 +81,7 @@ namespace asx::object
 		{
 			std::string s = "{";
 
-			using first_type = typename std::remove_const<std::remove_reference<TNoRef::first_type>::type>::type;
+			using first_type = typename std::remove_const<typename std::remove_reference<typename TNoRef::first_type>::type>::type;
 
 			if constexpr(asx::object::is_string<first_type>::value == true)
 			{
@@ -97,7 +97,7 @@ namespace asx::object
 
 			s += ":";
 
-			using second_type = typename std::remove_const<std::remove_reference<TNoRef::second_type>::type>::type;
+			using second_type = typename std::remove_const<typename std::remove_reference<typename TNoRef::second_type>::type>::type;
 
 			if constexpr(asx::object::is_string<second_type>::value == true)
 			{
@@ -218,7 +218,7 @@ namespace asx::object
 					endIt = it;
 				}
 
-				using first_type = typename std::remove_const<std::remove_reference<TNoRef::first_type>::type>::type;
+				using first_type = typename std::remove_const<typename std::remove_reference<typename TNoRef::first_type>::type>::type;
 				StringTo<first_type>(std::string_view{startIt, endIt}, t.first);
 
 				while(it != end && *it != ':')
@@ -260,7 +260,7 @@ namespace asx::object
 						++it;
 					}
 
-					using second_type = typename std::remove_const<std::remove_reference<TNoRef::second_type>::type>::type;
+					using second_type = typename std::remove_const<typename std::remove_reference<typename TNoRef::second_type>::type>::type;
 					StringTo<second_type>(std::string_view{startIt, endIt}, t.second);
 				}
 			}
@@ -300,7 +300,7 @@ namespace asx::object
 
 					endIt = it;
 
-					using value_type = typename std::remove_const<std::remove_reference<TNoRef::value_type>::type>::type;
+					using value_type = typename std::remove_const<typename std::remove_reference<typename TNoRef::value_type>::type>::type;
 
 					if(startIt != endIt)
 					{
@@ -348,7 +348,7 @@ namespace asx::object
 
 					endIt = it;
 
-					using value_type = typename std::remove_const<std::remove_reference<TNoRef::value_type>::type>::type;
+					using value_type = typename std::remove_const<typename std::remove_reference<typename TNoRef::value_type>::type>::type;
 
 					const auto value = StringTo<value_type>(std::string_view{startIt, endIt});
 					t[i] = value;
@@ -370,8 +370,8 @@ namespace asx::object
 		if constexpr(asx::object::is_pair<TNoRef>::value == true)
 		{
 			// Special case where key-value value_types for maps are const.
-			using first_type = typename std::remove_const<TNoRef::first_type>::type;
-			std::pair<first_type, TNoRef::second_type> t{};
+			using first_type = typename std::remove_const<typename TNoRef::first_type>::type;
+			std::pair<first_type, typename TNoRef::second_type> t{};
 			StringTo(x, t);
 			return t;
 		}
